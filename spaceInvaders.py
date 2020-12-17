@@ -3,7 +3,7 @@
 # Luc Anchling
 # github : https://github.com/lucanchling/Space_Invaders
 # 17 Décembre 2020
-# To Do :
+# To Do : à partir de la gestion du missile...
 
 # Importation des modules :
 from tkinter import Tk, Canvas, Label, Button, Menu
@@ -32,11 +32,26 @@ def deplacement():
     fenetre.after(15,deplacement)
     buttonStart.destroy()
 
+
 # position initiale du Vaisseau
 PosX = int(0.61*Largeur)
 PosY = int(1.2*Hauteur)
 tailleVaiss = 15
-def DeplacementVaisseau(event):
+
+# Missile :
+tailleMissile = 15
+vitMissile = 10
+
+# Permet de gérer le déplacement du missile
+def Deplacementmissile():
+    global PosX,PosY,Hauteur,tailleMissile,tailleVaiss
+    misX,misY=PosX,PosY
+    misY = misY-vitMissile
+    Canevas.coords(missile,misX,misY,misX,misY+tailleMissile)
+    fenetre.after(10,Deplacementmissile)
+
+# FPermet de gérer déplacement du vaisseau
+def GestionVaisseau(event):
     global PosX,Largeur,tailleVaiss
     touche = event.keysym
     # Vaisseau au milieu
@@ -57,6 +72,10 @@ def DeplacementVaisseau(event):
             PosX += 5
         # on dessine le Vaisseau � sa nouvelle position
     Canevas.coords(Vaisseau,PosX -tailleVaiss, PosY -tailleVaiss, PosX +tailleVaiss, PosY +tailleVaiss)
+    if touche == 'space':
+        missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
+        missile()
+
 
 # Partie Graphique :
 
@@ -68,7 +87,7 @@ fenetre.title('Space Invaders')
 Largeur,Hauteur=580,420
 Canevas = Canvas(fenetre, width = Largeur, height = Hauteur, bg='grey')
 
-Canevas.bind('<Key>',DeplacementVaisseau)
+Canevas.bind('<Key>',GestionVaisseau)
 Canevas.pack(side = 'left')
 
 # Zone affichant le score :
@@ -94,4 +113,5 @@ buttonQuit.pack()
 # Création de l'objet alien & vaisseau:
 alien = Canevas.create_rectangle(X-RAYON,Y-RAYON,X+RAYON,Y+RAYON,width=1,fill='blue')
 Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
+
 fenetre.mainloop()
