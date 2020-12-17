@@ -33,14 +33,14 @@ def deplacement():
     buttonStart.destroy()
 
 # position initiale du Vaisseau
-PosX = 0.61*Largeur
-PosY = 1.2*Hauteur
-
+PosX = int(0.61*Largeur)
+PosY = int(1.2*Hauteur)
+tailleVaiss = 15
 def DeplacementVaisseau(event):
-    global PosX,Largeur
+    global PosX,Largeur,tailleVaiss
     touche = event.keysym
     # Vaisseau au milieu
-    if PosX+10 < Largeur and PosX-10 > 0:
+    if PosX+tailleVaiss < Largeur and PosX-tailleVaiss > 0:
         # Déplacement à droite
         if touche == 'Right':
             PosX += 5
@@ -48,15 +48,15 @@ def DeplacementVaisseau(event):
         if touche == 'Left':
             PosX -= 5
     # Vaisseau sur le bord droit
-    elif PosX+10 == Largeur :
+    elif PosX+tailleVaiss > Largeur :
         if touche == 'Left':
             PosX -= 5
     # Vaisseau sur le bord gauche
-    elif PosX-10 == 0:
+    elif PosX-tailleVaiss < tailleVaiss:
         if touche == 'Right':
             PosX += 5
         # on dessine le Vaisseau � sa nouvelle position
-    Canevas.coords(Vaisseau,PosX -10, PosY -10, PosX +10, PosY +10)
+    Canevas.coords(Vaisseau,PosX -tailleVaiss, PosY -tailleVaiss, PosX +tailleVaiss, PosY +tailleVaiss)
 
 # Partie Graphique :
 
@@ -67,7 +67,7 @@ fenetre.title('Space Invaders')
 # Zone principale de jeu :
 Largeur,Hauteur=580,420
 Canevas = Canvas(fenetre, width = Largeur, height = Hauteur, bg='grey')
-Vaisseau = Canevas.create_rectangle(PosX-10,PosY-10,PosX+10,PosY+10,width=1,outline='black',fill='red')
+
 Canevas.bind('<Key>',DeplacementVaisseau)
 Canevas.pack(side = 'left')
 
@@ -91,7 +91,7 @@ buttonStart.pack()
 buttonQuit = Button(fenetre, text = 'Quit', command = fenetre.destroy)
 buttonQuit.pack()
 
-# Création de l'objet alien :
+# Création de l'objet alien & vaisseau:
 alien = Canevas.create_rectangle(X-RAYON,Y-RAYON,X+RAYON,Y+RAYON,width=1,fill='blue')
-
+Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
 fenetre.mainloop()
