@@ -40,15 +40,16 @@ tailleVaiss = 15
 
 # Missile :
 tailleMissile = 15
-vitMissile = 10
+vitMissile = 5
 
 # Permet de gérer le déplacement du missile
 def Deplacementmissile():
-    global PosX,PosY,Hauteur,tailleMissile,tailleVaiss
-    misX,misY=PosX,PosY
+    global misX,misY,Hauteur,tailleMissile,tailleVaiss,missile
     misY = misY-vitMissile
     Canevas.coords(missile,misX,misY,misX,misY+tailleMissile)
-    fenetre.after(10,Deplacementmissile)
+    if misY < 5:
+        Canevas.delete(missile)
+    fenetre.after(20,Deplacementmissile)
 
 # FPermet de gérer déplacement du vaisseau
 def GestionVaisseau(event):
@@ -73,8 +74,10 @@ def GestionVaisseau(event):
         # on dessine le Vaisseau � sa nouvelle position
     Canevas.coords(Vaisseau,PosX -tailleVaiss, PosY -tailleVaiss, PosX +tailleVaiss, PosY +tailleVaiss)
     if touche == 'space':
+        global missile,misX,misY
         missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
-        missile()
+        misX,misY=PosX,PosY
+        Deplacementmissile()
 
 
 # Partie Graphique :
