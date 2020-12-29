@@ -8,8 +8,8 @@
 # Importation des modules :
 from tkinter import Tk, Canvas, Label, Button, Menu
 
-Largeur = 480
-Hauteur = 320
+Largeur = 580
+Hauteur = 420
 RAYON = 20
 X = Largeur/2
 Y = Hauteur/2
@@ -34,26 +34,25 @@ def deplacement():
 
 
 # position initiale du Vaisseau
-PosX = int(0.61*Largeur)
-PosY = int(1.2*Hauteur)
+PosX = int(0.5*Largeur)
+PosY = int(0.95*Hauteur)
 tailleVaiss = 15
 
 # Missile :
 tailleMissile = 15
-vitMissile = 5
+vitMissile = 3
 
 # Permet de gérer le déplacement du missile
 def Deplacementmissile():
     global misX,misY,Hauteur,tailleMissile,tailleVaiss,missile
-    misY = misY-vitMissile
-    Canevas.coords(missile,misX,misY,misX,misY+tailleMissile)
-    if misY < 5:
-        Canevas.delete(missile)
-    fenetre.after(20,Deplacementmissile)
+    misY -= vitMissile
+    Canevas.coords(missile,misX,misY,misX,misY+tailleMissile) 
+    if misY > 5:
+        fenetre.after(15,Deplacementmissile)
 
 # FPermet de gérer déplacement du vaisseau
 def GestionVaisseau(event):
-    global PosX,Largeur,tailleVaiss
+    global PosX,Largeur,tailleVaiss,missile,misX,misY
     touche = event.keysym
     # Vaisseau au milieu
     if PosX+tailleVaiss < Largeur and PosX-tailleVaiss > 0:
@@ -64,20 +63,20 @@ def GestionVaisseau(event):
         if touche == 'Left':
             PosX -= 5
     # Vaisseau sur le bord droit
-    elif PosX+tailleVaiss > Largeur :
+    elif PosX+tailleVaiss >= Largeur :
         if touche == 'Left':
             PosX -= 5
     # Vaisseau sur le bord gauche
     elif PosX-tailleVaiss < tailleVaiss:
         if touche == 'Right':
             PosX += 5
-        # on dessine le Vaisseau � sa nouvelle position
+        # on dessine le Vaisseau à sa nouvelle position
     Canevas.coords(Vaisseau,PosX -tailleVaiss, PosY -tailleVaiss, PosX +tailleVaiss, PosY +tailleVaiss)
     if touche == 'space':
-        global missile,misX,misY
         missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
         misX,misY=PosX,PosY
         Deplacementmissile()
+
 
 
 # Partie Graphique :
@@ -87,7 +86,6 @@ fenetre = Tk()
 fenetre.title('Space Invaders')
 
 # Zone principale de jeu :
-Largeur,Hauteur=580,420
 Canevas = Canvas(fenetre, width = Largeur, height = Hauteur, bg='grey')
 
 Canevas.bind('<Key>',GestionVaisseau)
