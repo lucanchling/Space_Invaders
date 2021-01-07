@@ -19,11 +19,12 @@ delta = 75
 X = [largeur/2,largeur/2+delta,largeur/2-delta,largeur/2+2*delta,largeur/2-2*delta,largeur/2+3*delta,largeur/2-3*delta]
 Y = hauteur/2
 DX = 0.5
+nbVie = 3
 
 # Fonction déplaçant les aliens
 def deplacement():
     Canevas.focus_set()
-    global X,Y,DX,RAYON,largeur,hauteur,PosY,X,Y,misAlien,misAlX,misAlY
+    global X,Y,DX,RAYON,largeur,hauteur,PosY,X,Y,misAlien,misAlX,misAlY,nbVie,labelVie
     # Gestion bord droit
     for i in range(len(X)):
         if X[i]+RAYON+DX > largeur:
@@ -33,11 +34,14 @@ def deplacement():
         if X[i]-RAYON+DX < 0:
             X[i] = 2*RAYON-X[i]
             DX = -DX
-            Y += 5
+            Y += 55
         X[i] = X[i]+DX
         Canevas.coords(alien[i],X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON)
-        if Y + RAYON >= PosY - tailleVaiss:
-            Canevas.delete('all')                
+    # Mort du joueur - Alien en bas
+        if Y + RAYON >= PosY - tailleVaiss and nbVie > 0:
+            nbVie -= 1
+            labelVie['text'] = 'Nombre de vie(s) restante(s) : ' + str(nbVie)
+            Canevas.delete('all')
     fenetre.after(20,deplacement)
     buttonStart.destroy()
     # Missile des aliens (à un tps aléatoire)
@@ -77,22 +81,24 @@ def deplacementMissile():
 
 # Permet de gérer les missiles des aliens
 def alienMissile():
-    global misAlX,misAlY,misAlien,vitMissile,tailleMissile
+    global misAlX,misAlY,misAlien,vitMissile,tailleMissile,labelVie,nbVie
     misAlY += vitMissile
     Canevas.coords(misAlien,misAlX,misAlY,misAlX,misAlY+tailleMissile)
     if misAlY < hauteur:
         fenetre.after(15,alienMissile)
-    # Collision avec le bord haut
+    # Collision avec le bord bas
     if misAlY > hauteur - 10:
         Canevas.delete(misAlien)
     # Collision avec le vaisseau
-    if misAlX > PosX - tailleVaiss and misAlX < PosX + tailleVaiss and misAlY > PosY - tailleVaiss and misAlY < PosY + tailleVaiss:
+    if misAlX > PosX - tailleVaiss and misAlX < PosX + tailleVaiss and misAlY > PosY - tailleVaiss and misAlY < PosY + tailleVaiss and nbVie > 0:
+        nbVie -= 1
+        labelVie['text'] = 'Nombre de vie(s) restante(s) : ' + str(nbVie)
         Canevas.delete('all')
 
 
 # Permet de gérer déplacement du vaisseau
 def gestionVaisseau(event):
-    global PosX,largeur,tailleVaiss,missile,misX,misY,X,Y,misAlien,misAlX,misAlY
+    global PosX,largeur,tailleVaiss,missile,misX,misY,X,Y,misAlien,misAlX,misAlY,Vaisseau
     touche = event.keysym
     # Vaisseau au milieu
     if PosX+tailleVaiss < largeur and PosX-tailleVaiss > 0:
@@ -135,6 +141,9 @@ Canevas.pack(side = 'left')
 labelScore = Label(fenetre, text='Score :')
 labelScore.pack(side = 'top')
 
+# Zone affichant le nombre de vie(s) restante(s):
+labelVie = Label(fenetre, text='Nombre de vie(s) restante(s) : 3')
+labelVie.pack(side = 'top')
 # Menu :
 menubar = Menu(fenetre)
 menu1 = Menu(menubar, tearoff = 0)
@@ -142,6 +151,7 @@ menu1.add_command(label = 'New Game')
 menu1.add_command(label = 'Quit', command = fenetre.destroy)
 menubar.add_cascade(label = 'Partie', menu = menu1)
 fenetre.config(menu = menubar)
+
 
 # Bouton déclenchant la partie :
 buttonStart = Button(fenetre, text = 'Start', command = deplacement)
@@ -152,11 +162,9 @@ buttonQuit = Button(fenetre, text = 'Quit', command = fenetre.destroy)
 buttonQuit.pack()
 
 # Création de l'objet alien & vaisseau:
-
 alien = []
 for i in range(len(X)):
     alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
-Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
-
+    Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
 
 fenetre.mainloop()
