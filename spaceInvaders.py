@@ -10,7 +10,7 @@ from tkinter import Tk, Canvas, Label, Button, Menu
 from time import time
 from random import randint
 
-tic = time()
+
 
 largeur = 580
 hauteur = 420
@@ -23,13 +23,13 @@ DX = 0.5
 # Fonction déplaçant les aliens
 def deplacement():
     Canevas.focus_set()
-    global X,Y,DX,RAYON,largeur,hauteur,PosY
+    global X,Y,DX,RAYON,largeur,hauteur,PosY,X,Y,misAlien,misAlX,misAlY
     # Gestion bord droit
     for i in range(len(X)):
         if X[i]+RAYON+DX > largeur:
             X[i] = 2*(largeur-RAYON)-X[i]
             DX = -DX
-        # Gestion bord gauche avec desccente de l'alien
+    # Gestion bord gauche avec desccente de l'alien
         if X[i]-RAYON+DX < 0:
             X[i] = 2*RAYON-X[i]
             DX = -DX
@@ -38,8 +38,13 @@ def deplacement():
         Canevas.coords(alien[i],X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON)
         if Y + RAYON >= PosY - tailleVaiss:
             Canevas.delete('all')                
-    fenetre.after(15,deplacement)
+    fenetre.after(20,deplacement)
     buttonStart.destroy()
+    # Missile des aliens (à un tps aléatoire)
+    if randint(0,3500) < 5:
+        misAlX,misAlY=X[randint(0,len(X)-1)],Y
+        misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
+        alienMissile()
 
 
 # position initiale du Vaisseau
@@ -111,10 +116,6 @@ def gestionVaisseau(event):
         missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
         misX,misY=PosX,PosY
         deplacementMissile()
-    if touche == 'a':
-        misAlX,misAlY=X[randint(0,len(X)-1)],Y
-        misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
-        alienMissile()
 
 
 
