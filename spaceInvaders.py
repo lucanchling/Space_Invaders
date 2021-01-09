@@ -3,28 +3,46 @@
 # Luc Anchling
 # github : https://github.com/lucanchling/Space_Invaders
 # 17 Décembre 2020
-# To Do : 
+# To Do : à partir de Gestion des vies...
 
 # Importation des modules :
-from tkinter import Tk, Canvas, Label, Button, Menu
+from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage
 from time import time
 from random import randint
-
 
 
 largeur = 580
 hauteur = 420
 RAYON = 20
-delta = 75
+delta = 85
 X = [largeur/2,largeur/2+delta,largeur/2-delta,largeur/2+2*delta,largeur/2-2*delta,largeur/2+3*delta,largeur/2-3*delta]
 Y = hauteur/2
 DX = 0.5
 nbVie = 3
+deplacementVertical = 95
+
+# Gestion de fin de partie :
+def fin():
+    global labelScore,Canevas
+    Canevas.destroy()
+    
+    
+# permet de gérer la vie 
+def gestionVie():
+    global nbVie
+    if nbVie > 0 :
+        fenetre.after(1000)
+        Canevas.delete('all')
+        nbVie -= 1
+        labelVie['text'] = 'Nombre de vie(s) restante(s) : ' + str(nbVie)
+        debut()
+    else:
+        fin()
 
 # Fonction déplaçant les aliens
 def deplacement():
     Canevas.focus_set()
-    global X,Y,DX,RAYON,largeur,hauteur,PosY,X,Y,misAlien,misAlX,misAlY,nbVie,labelVie
+    global X,Y,DX,RAYON,largeur,hauteur,PosY,X,Y,misAlien,misAlX,misAlY,deplacementVertical
     # Gestion bord droit
     for i in range(len(X)):
         if X[i]+RAYON+DX > largeur:
@@ -34,19 +52,17 @@ def deplacement():
         if X[i]-RAYON+DX < 0:
             X[i] = 2*RAYON-X[i]
             DX = -DX
-            Y += 55
+            Y += deplacementVertical
         X[i] = X[i]+DX
         Canevas.coords(alien[i],X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON)
     # Mort du joueur - Alien en bas
-        if Y + RAYON >= PosY - tailleVaiss and nbVie > 0:
-            nbVie -= 1
-            labelVie['text'] = 'Nombre de vie(s) restante(s) : ' + str(nbVie)
-            Canevas.delete('all')
+        if Y + RAYON >= PosY - tailleVaiss:
+            gestionVie()
     fenetre.after(20,deplacement)
     buttonStart.destroy()
-    # Missile des aliens (à un tps aléatoire)
-    if randint(0,3500) < 5:
-        misAlX,misAlY=X[randint(0,len(X)-1)],Y
+    # Envoi du Missile des aliens (à un tps aléatoire)
+    if randint(0,1500) < 5:
+        misAlX,misAlY=X[0],Y #randint(0,len(X)-1)
         misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
         alienMissile()
 
@@ -90,10 +106,9 @@ def alienMissile():
     if misAlY > hauteur - 10:
         Canevas.delete(misAlien)
     # Collision avec le vaisseau
-    if misAlX > PosX - tailleVaiss and misAlX < PosX + tailleVaiss and misAlY > PosY - tailleVaiss and misAlY < PosY + tailleVaiss and nbVie > 0:
-        nbVie -= 1
-        labelVie['text'] = 'Nombre de vie(s) restante(s) : ' + str(nbVie)
-        Canevas.delete('all')
+    if misAlX > PosX - tailleVaiss and misAlX < PosX + tailleVaiss and misAlY > PosY - tailleVaiss and misAlY < PosY + tailleVaiss:
+        misAlX,misAlY=0,0
+        gestionVie()
 
 
 # Permet de gérer déplacement du vaisseau
@@ -119,9 +134,11 @@ def gestionVaisseau(event):
     # on dessine le Vaisseau à sa nouvelle position
     Canevas.coords(Vaisseau,PosX -tailleVaiss, PosY -tailleVaiss, PosX +tailleVaiss, PosY +tailleVaiss)
     if touche == 'space':
-        missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
-        misX,misY=PosX,PosY
-        deplacementMissile()
+            missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
+            misX,misY=PosX,PosY
+            deplacementMissile()
+
+
 
 
 
@@ -133,9 +150,10 @@ fenetre.title('Space Invaders')
 
 # Zone principale de jeu :
 Canevas = Canvas(fenetre, width = largeur, height = hauteur, bg='grey')
-
 Canevas.bind('<Key>',gestionVaisseau)
 Canevas.pack(side = 'left')
+background = PhotoImage(file = "background.gif")
+Canevas.create_image(10,10,image = background)
 
 # Zone affichant le score :
 labelScore = Label(fenetre, text='Score :')
@@ -152,19 +170,27 @@ menu1.add_command(label = 'Quit', command = fenetre.destroy)
 menubar.add_cascade(label = 'Partie', menu = menu1)
 fenetre.config(menu = menubar)
 
+# Début de la partie avec création l'objet alien & vaisseau:
+def debut():
+    global X,Y,RAYON,Vaisseau,Canevas,tailleVaiss,alien,background,missile
+    Canevas.create_image(10,10,image = background)
+    Y = hauteur/2
+    alien = []
+    for i in range(len(X)):
+        alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
+    Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
+    deplacement()
+
 
 # Bouton déclenchant la partie :
-buttonStart = Button(fenetre, text = 'Start', command = deplacement)
+buttonStart = Button(fenetre, text = 'Start', command = debut)
 buttonStart.pack()
 
 # Bouton permettant de sortir du jeu :
 buttonQuit = Button(fenetre, text = 'Quit', command = fenetre.destroy)
 buttonQuit.pack()
 
-# Création de l'objet alien & vaisseau:
-alien = []
-for i in range(len(X)):
-    alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
-    Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
 
 fenetre.mainloop()
+
+
