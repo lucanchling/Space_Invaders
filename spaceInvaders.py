@@ -6,11 +6,11 @@
 # To Do : à partir de la gestion du score...
 
 # Importation des modules :
-from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage
-from time import time
+from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage,messagebox
 from random import randint
+from os import path
+from time import time
 
-tic = time()
 largeur = 580
 hauteur = 420
 RAYON = 20
@@ -46,10 +46,18 @@ def debut():
     deplacementAlien()
     deplacementAlienBonus()
 
-
 # Gestion de fin de partie :
 def fin():
-    Canevas.delete('all')
+    Canevas.destroy()
+    if path.exists('score.txt') == False :  # Test de l'existence du fichier 'score.txt'
+        initDoc()
+    doc = open('score.txt','a')
+    if nbVie > 1:
+        labelScore['text'] = 'Score : ' + str(score*nbVie) + 'pts'
+        doc.write('\n'+str(score*nbVie))
+    else:
+        doc.write('\n'+str(score))
+    doc.close()
 
 # permet de gérer la vie 
 def gestionVie():
@@ -63,16 +71,30 @@ def gestionVie():
     else:
         fin()
 
+
+# Fonction initialisant le document contenant les scores avec un record par défaut à 100 pts
+def initDoc():
+    doc = open('score.txt','w')
+    doc.write("100")
+    doc.close()
+
 # Gestion du score
 def scorePlayer(ennemi):
     global labelScore,score
     l_alien = ['alien','alienBonus']
-    l_score = [25,150]
+    l_score = [50,150]
     for indice, valeur in enumerate(l_alien):
         if ennemi == l_alien[indice]:
             score += l_score[indice]
-    labelScore['text'] = 'Score : ' + str(score)
+    labelScore['text'] = 'Score : ' + str(score) + 'pts'
 
+# Fonction affichant le record actuel
+def record():
+    doc = open('score.txt','r')
+    lscore = doc.readlines()
+    print(lscore,max(lscore))
+    messagebox.showinfo("Record", 'Le record est de : '+ str(max(lscore).strip()) + 'pts')
+    doc.close()
 
 # Fonction gérant le déplacement et l'envoi des missiles des aliens
 def deplacementAlien():
@@ -163,10 +185,12 @@ def deplacementMissile():
     # Collision avec l'alien bonus
     if misX > bonusX - RAYON and misX < bonusX + RAYON and misY > bonusY - RAYON and misY < bonusY + RAYON:
             Canevas.delete(alienBonus)
-            alienBonusVie = False
             Canevas.delete(missile)
             misX,misY=0,0
             scorePlayer('alienBonus')
+            alienBonusVie = False
+    if alienBonusVie == False and len(X) == 0:
+        fin()
 
 
 # Permet de gérer les missiles des aliens
@@ -219,6 +243,10 @@ def gestionVaisseau(event):
             misX,misY=PosX,PosY
             deplacementMissile()
 
+# Page à propos
+def about():
+    messagebox.showinfo("A propos", 'Ce jeu reprend le principe du fameux jeu "Space Invaders"' + '\n' + 'Développé par Luc Anchling')
+
 # Partie Graphique :
 
 # Création de la fenetre :
@@ -239,20 +267,22 @@ labelScore.pack(side = 'top')
 # Zone affichant le nombre de vie(s) restante(s):
 labelVie = Label(fenetre, text='Nombre de vie(s) restante(s) : 3')
 labelVie.pack(side = 'top')
+
 # Menu :
 menubar = Menu(fenetre)
+
 menu1 = Menu(menubar, tearoff = 0)
-menu1.add_command(label = 'New Game')
 menu1.add_command(label = 'Quit', command = fenetre.destroy)
 menubar.add_cascade(label = 'Partie', menu = menu1)
+
+menu2 = Menu(menubar, tearoff = 0)
+menu2.add_command(label = 'High Score',command = record)
+menu2.add_command(label = 'A Propos', command = about)
+menubar.add_cascade(label = 'Infos', menu = menu2)
 fenetre.config(menu = menubar)
 
 # Bouton déclenchant la partie :
 buttonStart = Button(fenetre, text = 'Start', command = debut)
 buttonStart.pack()
-
-# Bouton permettant de sortir du jeu :
-buttonQuit = Button(fenetre, text = 'Quit', command = fenetre.destroy)
-buttonQuit.pack()
 
 fenetre.mainloop()
