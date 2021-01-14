@@ -18,7 +18,7 @@ delta = 85
 X = [largeur/2,largeur/2+delta,largeur/2-delta,largeur/2+2*delta,largeur/2-2*delta,largeur/2+3*delta,largeur/2-3*delta]
 Y = hauteur/2
 DX = 0.5
-DXx= .25
+DXx= 1.5
 nbVie = 3
 vieIlot = [3,3]
 deplacementVertical = 10
@@ -26,9 +26,8 @@ alienBonusVie = True
 score = 0
 # Gestion de fin de partie :
 def fin():
-    global labelScore,Canevas
-    Canevas.destroy()
-    
+    Canevas.delete('all')
+
 # permet de gérer la vie 
 def gestionVie():
     global nbVie
@@ -50,7 +49,6 @@ def scorePlayer(ennemi):
         if ennemi == l_alien[indice]:
             score += l_score[indice]
     labelScore['text'] = 'Score : ' + str(score)
-
 
 
 # Fonction gérant le déplacement et l'envoi des missiles des aliens
@@ -75,7 +73,7 @@ def deplacementAlien():
     fenetre.after(20,deplacementAlien)
     buttonStart.destroy()
     # Envoi du Missile des aliens (à un tps aléatoire)
-    if randint(0,1500) < 5:
+    if randint(0,3500) < 5:
         misAlX,misAlY=X[randint(0,len(X)-1)],Y
         misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
         alienMissile()
@@ -89,20 +87,21 @@ def deplacementAlienBonus():
         if bonusX+RAYON+DXx > largeur:
             bonusX = 2*(largeur-RAYON)-bonusX
             DXx = -DXx
+            bonusY += 5
         # Gestion bord gauche avec desccente de l'alien
         if bonusX-RAYON+DX < 0:
             bonusX = 2*RAYON-bonusX
             DXx = -DXx
-            bonusY += deplacementVertical
+            bonusY += 5
         bonusX = bonusX+DXx
         Canevas.coords(alienBonus,bonusX-RAYON,bonusY-RAYON,bonusX+RAYON,bonusY+RAYON)
         # Mort du joueur - Alien en bas
         if bonusY + RAYON >= PosY - tailleVaiss:
             gestionVie()
-        fenetre.after(30,deplacementAlienBonus)
+        fenetre.after(20,deplacementAlienBonus)
         buttonStart.destroy()
         # Envoi du Missile des aliens (à un tps aléatoire)
-        if randint(0,5500) < 5:
+        if randint(0,1500) < 5:
             misAlX,misAlY=bonusX,bonusY
             misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
             alienMissile()
