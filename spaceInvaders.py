@@ -24,6 +24,29 @@ vieIlot = [3,3]
 deplacementVertical = 10
 alienBonusVie = True
 score = 0
+
+# Début de la partie avec création des aliens, des ilots & du vaisseau:
+def debut():
+    Canevas.delete('all')
+    global X,Y,Vaisseau,alien,missile,affVieIlot,bonusX,bonusY,alienBonus,bonusX,bonusY
+    Canevas.create_image(10,10,image = background)
+    Y = hauteur/2
+    alien = []
+    bonusX,bonusY = largeur/2, hauteur/2 - 100
+    alienBonus = Canevas.create_rectangle(bonusX-RAYON,bonusY-RAYON,bonusX+RAYON,bonusY+RAYON,width=1,fill='orange')
+    for i in range(len(X)):
+        alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
+    Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
+    ilot = []
+    affVieIlot = []
+    for i in range(1,4,2):
+        ilot.append(Canevas.create_rectangle(i*largeur/5,hauteur-50-RAYON,(i+1)*largeur/5,hauteur-50,width=1,fill='grey'))
+        # Affichage des vies de chaque ilot :
+        affVieIlot.append(Canevas.create_text((i+.5)*largeur/5,hauteur-50-.5*RAYON,text =str(vieIlot[(i-1)//2]), fill ="white", font="Arial 15 bold"))
+    deplacementAlien()
+    deplacementAlienBonus()
+
+
 # Gestion de fin de partie :
 def fin():
     Canevas.delete('all')
@@ -195,27 +218,6 @@ def gestionVaisseau(event):
             missile = Canevas.create_line(PosX,PosY,PosX,PosY-tailleMissile,fill='white')
             misX,misY=PosX,PosY
             deplacementMissile()
-
-# Début de la partie avec création des aliens, des ilots & du vaisseau:
-def debut():
-    global X,Y,Vaisseau,alien,missile,affVieIlot,bonusX,bonusY,alienBonus,bonusX,bonusY
-    Canevas.create_image(10,10,image = background)
-    Y = hauteur/2
-    alien = []
-    bonusX,bonusY = largeur/2, hauteur/2 - 100
-    alienBonus = Canevas.create_rectangle(bonusX-RAYON,bonusY-RAYON,bonusX+RAYON,bonusY+RAYON,width=1,fill='orange')
-    for i in range(len(X)):
-        alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
-    Vaisseau = Canevas.create_rectangle(PosX-tailleVaiss,PosY-tailleVaiss,PosX+tailleVaiss,PosY+tailleVaiss,width=1,outline='black',fill='red')
-    ilot = []
-    affVieIlot = []
-    for i in range(1,4,2):
-        ilot.append(Canevas.create_rectangle(i*largeur/5,hauteur-50-RAYON,(i+1)*largeur/5,hauteur-50,width=1,fill='grey'))
-        # Affichage des vies de chaque ilot :
-        affVieIlot.append(Canevas.create_text((i+.5)*largeur/5,hauteur-50-.5*RAYON,text =str(vieIlot[(i-1)//2]), fill ="white", font="Arial 15 bold"))
-    deplacementAlien()
-    deplacementAlienBonus()
-
 
 # Partie Graphique :
 
