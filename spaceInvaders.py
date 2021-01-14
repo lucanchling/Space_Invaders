@@ -3,7 +3,7 @@
 # Luc Anchling
 # github : https://github.com/lucanchling/Space_Invaders
 # 17 Décembre 2020
-# To Do : à partir de la gestion du score...
+# To Do : Commenter un max et faire des classes...
 
 # Importation des modules :
 from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage,messagebox
