@@ -3,7 +3,7 @@
 # Luc Anchling
 # github : https://github.com/lucanchling/Space_Invaders
 # 17 Décembre 2020
-# To Do : à partir de création d'un ennemi bonus...
+# To Do : à partir de la gestion du score...
 
 # Importation des modules :
 from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage
@@ -23,7 +23,7 @@ nbVie = 3
 vieIlot = [3,3]
 deplacementVertical = 10
 alienBonusVie = True
-
+score = 0
 # Gestion de fin de partie :
 def fin():
     global labelScore,Canevas
@@ -40,6 +40,18 @@ def gestionVie():
         debut()
     else:
         fin()
+
+# Gestion du score
+def scorePlayer(ennemi):
+    global labelScore,score
+    l_alien = ['alien','alienBonus']
+    l_score = [25,150]
+    for indice, valeur in enumerate(l_alien):
+        if ennemi == l_alien[indice]:
+            score += l_score[indice]
+    labelScore['text'] = 'Score : ' + str(score)
+
+
 
 # Fonction gérant le déplacement et l'envoi des missiles des aliens
 def deplacementAlien():
@@ -125,11 +137,14 @@ def deplacementMissile():
             del X[i]
             Canevas.delete(missile)
             misX,misY=0,0
+            scorePlayer('alien')
     # Collision avec l'alien bonus
     if misX > bonusX - RAYON and misX < bonusX + RAYON and misY > bonusY - RAYON and misY < bonusY + RAYON:
             Canevas.delete(alienBonus)
             alienBonusVie = False
             Canevas.delete(missile)
+            misX,misY=0,0
+            scorePlayer('alienBonus')
 
 
 # Permet de gérer les missiles des aliens
@@ -217,7 +232,7 @@ background = PhotoImage(file = "background.gif")
 Canevas.create_image(10,10,image = background)
 
 # Zone affichant le score :
-labelScore = Label(fenetre, text='Score :')
+labelScore = Label(fenetre, text='Score : 0')
 labelScore.pack(side = 'top')
 
 # Zone affichant le nombre de vie(s) restante(s):
