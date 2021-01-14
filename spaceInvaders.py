@@ -22,6 +22,7 @@ DXx= .25
 nbVie = 3
 vieIlot = [3,3]
 deplacementVertical = 10
+alienBonusVie = True
 
 # Gestion de fin de partie :
 def fin():
@@ -71,28 +72,30 @@ def deplacementAlien():
 def deplacementAlienBonus():
     Canevas.focus_set()
     global bonusX,bonusY,alienBonus,DXx,misAlien,misAlX,misAlY
-    # Gestion bord droit
-    for i in range(len(X)):
+    if alienBonusVie == True: 
+        # Gestion bord droit
         if bonusX+RAYON+DXx > largeur:
             bonusX = 2*(largeur-RAYON)-bonusX
             DXx = -DXx
-    # Gestion bord gauche avec desccente de l'alien
+        # Gestion bord gauche avec desccente de l'alien
         if bonusX-RAYON+DX < 0:
             bonusX = 2*RAYON-bonusX
             DXx = -DXx
             bonusY += deplacementVertical
         bonusX = bonusX+DXx
         Canevas.coords(alienBonus,bonusX-RAYON,bonusY-RAYON,bonusX+RAYON,bonusY+RAYON)
-    # Mort du joueur - Alien en bas
+        # Mort du joueur - Alien en bas
         if bonusY + RAYON >= PosY - tailleVaiss:
             gestionVie()
-    fenetre.after(30,deplacementAlienBonus)
-    buttonStart.destroy()
-    # Envoi du Missile des aliens (à un tps aléatoire)
-    if randint(0,5500) < 5:
-        misAlX,misAlY=bonusX,bonusY
-        misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
-        alienMissile()
+        fenetre.after(30,deplacementAlienBonus)
+        buttonStart.destroy()
+        # Envoi du Missile des aliens (à un tps aléatoire)
+        if randint(0,5500) < 5:
+            misAlX,misAlY=bonusX,bonusY
+            misAlien = Canevas.create_line(misAlX,misAlY,misAlX,misAlY-tailleMissile,fill='white')
+            alienMissile()
+    else :
+        Canevas.delete(alienBonus)
 
 
 # position initiale du Vaisseau
@@ -106,7 +109,7 @@ vitMissile = 3
 
 # Permet de gérer le déplacement du missile
 def deplacementMissile():
-    global misX,misY,missile,bonusX,bonusY,alienBonus
+    global misX,misY,missile,bonusX,bonusY,alienBonus,alienBonusVie
     misY -= vitMissile
     Canevas.coords(missile,misX,misY,misX,misY+tailleMissile) 
     if misY > 5:
@@ -121,10 +124,11 @@ def deplacementMissile():
             del alien[i]
             del X[i]
             Canevas.delete(missile)
+            misX,misY=0,0
     # Collision avec l'alien bonus
     if misX > bonusX - RAYON and misX < bonusX + RAYON and misY > bonusY - RAYON and misY < bonusY + RAYON:
             Canevas.delete(alienBonus)
-            bonusX,bonusY=1000,1000
+            alienBonusVie = False
             Canevas.delete(missile)
 
 
