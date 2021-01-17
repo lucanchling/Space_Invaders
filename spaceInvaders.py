@@ -258,7 +258,7 @@ def about():
 fenetre = Tk()
 fenetre.title('Space Invaders')
 
-# Zone principale de jeu :
+# Zone principale de jeu avec fond d'écran:
 Canevas = Canvas(fenetre, width = largeur, height = hauteur, bg='grey')
 Canevas.bind('<Key>',gestionVaisseau)
 Canevas.pack(side = 'left')
