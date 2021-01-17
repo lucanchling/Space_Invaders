@@ -3,36 +3,49 @@
 # Luc Anchling
 # github : https://github.com/lucanchling/Space_Invaders
 # 17 Décembre 2020
-# To Do : Commenter un max et faire des classes...
+# To Do : Essayer d'intégrer des classes
 
 # Importation des modules :
 from tkinter import Tk, Canvas, Label, Button, Menu, PhotoImage,messagebox
 from random import randint
 from os import path
-from time import time
 
+# Dimension :
 largeur = 580
 hauteur = 420
 RAYON = 20
+
 delta = 85
+# Coordonnées aliens :
 X = [largeur/2,largeur/2+delta,largeur/2-delta,largeur/2+2*delta,largeur/2-2*delta,largeur/2+3*delta,largeur/2-3*delta]
 Y = hauteur/2
-DX = 0.5
-DXx= 1.5
-nbVie = 3
-vieIlot = [3,3]
+
+# Déplacements horizontaux des ennemis 
+DX = 0.5   # Classique
+DXx= 1.5   # Bonus
+nbVie = 3  # Nombre de vie de l'user
+vieIlot = [3,3]   # nombre de vie des ilots de protection
 deplacementVertical = 10
-alienBonusVie = True
+alienBonusVie = True   # Etat de l'ennemi bonus (True : vivant - False : Dead)
 score = 0
+
+# position initiale et dimension du Vaisseau
+PosX = int(0.5*largeur)
+PosY = int(0.95*hauteur)
+tailleVaiss = 15
+
+# dimension et vitesse des Missiles :
+tailleMissile = 15
+vitMissile = 3
 
 # Début de la partie avec création des aliens, des ilots & du vaisseau:
 def debut():
     Canevas.delete('all')
     global X,Y,Vaisseau,alien,missile,affVieIlot,bonusX,bonusY,alienBonus,bonusX,bonusY
     Canevas.create_image(10,10,image = background)
-    Y = hauteur/2
+    Y = hauteur/2  # Réinitialisation de la hauteur des ennemis
     alien = []
-    bonusX,bonusY = largeur/2, hauteur/2 - 100
+    bonusX,bonusY = largeur/2, hauteur/2 - 100    
     alienBonus = Canevas.create_rectangle(bonusX-RAYON,bonusY-RAYON,bonusX+RAYON,bonusY+RAYON,width=1,fill='orange')
     for i in range(len(X)):
         alien.append(Canevas.create_rectangle(X[i]-RAYON,Y-RAYON,X[i]+RAYON,Y+RAYON,width=1,fill='blue'))
@@ -46,7 +59,7 @@ def debut():
     deplacementAlien()
     deplacementAlienBonus()
 
-# Gestion de fin de partie :
+# Gestion de fin de partie avec écriture du score dans un .txt:
 def fin():
     Canevas.destroy()
     if path.exists('score.txt') == False :  # Test de l'existence du fichier 'score.txt'
@@ -59,7 +72,7 @@ def fin():
         doc.write('\n'+str(score))
     doc.close()
 
-# permet de gérer la vie 
+# permet de gérer le nombre de vie du joueur en relançant ou non la partie si il reste des vies 
 def gestionVie():
     global nbVie
     if nbVie > 0 :
@@ -83,8 +96,9 @@ def scorePlayer(ennemi):
     global labelScore,score
     l_alien = ['alien','alienBonus']
     l_score = [50,150]
-    for indice, valeur in enumerate(l_alien):
-        if ennemi == l_alien[indice]:
+    # Permet de savoir quel ennemi a été tué
+    for indice,valeur in enumerate(l_alien):
+        if ennemi == valeur:
             score += l_score[indice]
     labelScore['text'] = 'Score : ' + str(score) + 'pts'
 
@@ -153,16 +167,6 @@ def deplacementAlienBonus():
     else :
         Canevas.delete(alienBonus)
 
-
-# position initiale du Vaisseau
-PosX = int(0.5*largeur)
-PosY = int(0.95*hauteur)
-tailleVaiss = 15
-
-# Missile :
-tailleMissile = 15
-vitMissile = 3
-
 # Permet de gérer le déplacement du missile
 def deplacementMissile():
     global misX,misY,missile,bonusX,bonusY,alienBonus,alienBonusVie
@@ -189,6 +193,7 @@ def deplacementMissile():
             misX,misY=0,0
             scorePlayer('alienBonus')
             alienBonusVie = False
+    # Lorsque tous les aliens sont tués
     if alienBonusVie == False and len(X) == 0:
         fin()
 
